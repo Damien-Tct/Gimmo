@@ -1,0 +1,36 @@
+{% extends 'immobilier/base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}Ajouter un garant{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="bi bi-shield-plus me-2"></i> Ajouter un garant</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-2">{{ form.civilite|as_crispy_field }}</div>
+                        <div class="col-md-5">{{ form.nom|as_crispy_field }}</div>
+                        <div class="col-md-5">{{ form.prenom|as_crispy_field }}</div>
+                        <div class="col-md-6">{{ form.email|as_crispy_field }}</div>
+                        <div class="col-md-6">{{ form.telephone|as_crispy_field }}</div>
+                        <div class="col-md-6">{{ form.adresse|as_crispy_field }}</div>
+                        <div class="col-md-3">{{ form.code_postal|as_crispy_field }}</div>
+                        <div class="col-md-3">{{ form.ville|as_crispy_field }}</div>
+                        <div class="col-md-4">{{ form.revenus_mensuels|as_crispy_field }}</div>
+                        <div class="col-md-4">{{ form.document|as_crispy_field }}</div>
+                    </div>
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Ajouter le garant</button>
+                        <a href="{% url 'immobilier:locataire_list' %}" class="btn btn-secondary">Annuler</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

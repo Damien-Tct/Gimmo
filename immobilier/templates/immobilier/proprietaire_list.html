@@ -1,0 +1,102 @@
+{% extends 'immobilier/base.html' %}
+{% block title %}Propriétaires{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="px-4 pt-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'immobilier:dashboard' %}">Dashboard</a></li>
+        <li class="breadcrumb-item active">Propriétaires</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3><i class="bi bi-people me-2"></i> Propriétaires</h3>
+    <a href="{% url 'immobilier:proprietaire_create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> Nouveau propriétaire
+    </a>
+</div>
+
+<!-- Filtres -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-2">
+            <div class="col-md-4">{{ filter.form.q }}</div>
+            <div class="col-md-3">{{ filter.form.ville }}</div>
+            <div class="col-md-2">{{ filter.form.actif }}</div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i></button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Nom</th>
+                        <th>Email</th>
+                        <th>Téléphone</th>
+                        <th>Ville</th>
+                        <th>Biens</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for proprietaire in proprietaires %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'immobilier:proprietaire_detail' proprietaire.pk %}" class="text-decoration-none fw-medium">
+                                {{ proprietaire.get_full_name }}
+                            </a>
+                        </td>
+                        <td>{{ proprietaire.email }}</td>
+                        <td>{{ proprietaire.telephone }}</td>
+                        <td>{{ proprietaire.ville }}</td>
+                        <td><span class="badge bg-info">{{ proprietaire.get_nb_biens }}</span></td>
+                        <td>
+                            {% if proprietaire.actif %}
+                            <span class="badge bg-success">Actif</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Inactif</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'immobilier:proprietaire_detail' proprietaire.pk %}" class="btn btn-outline-primary">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{% url 'immobilier:proprietaire_update' proprietaire.pk %}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="text-center py-4 text-muted">Aucun propriétaire trouvé</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% if is_paginated %}
+<nav class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Précédent</a></li>
+        {% endif %}
+        <li class="page-item active"><span class="page-link">{{ page_obj.number }}/{{ page_obj.paginator.num_pages }}</span></li>
+        {% if page_obj.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Suivant</a></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

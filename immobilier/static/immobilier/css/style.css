@@ -1,0 +1,234 @@
+/* ===================================================================
+   STYLES PERSONNALISÉS - Application Gestion Immobilière
+   =================================================================== */
+
+/* --- Sidebar --- */
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 100;
+    overflow-y: auto;
+    width: 250px;
+    height: 100vh;
+}
+
+/* Contenu principal décalé à droite pour laisser place à la sidebar */
+.main-content {
+    margin-left: 250px;
+    min-height: 100vh;
+    background-color: #f8f9fa;
+    width: calc(100% - 250px);
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar .nav-link {
+    padding: 0.6rem 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+}
+
+.sidebar .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar .nav-link.active {
+    background-color: #0d6efd !important;
+}
+/* --- Cartes --- */
+.card {
+    border-radius: 0.75rem !important;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.card .card-header {
+    border-radius: 0.75rem 0.75rem 0 0 !important;
+    font-weight: 600;
+}
+
+/* --- Tableaux --- */
+.table th {
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.table-hover tbody tr {
+    transition: background-color 0.15s;
+}
+
+/* --- Badges --- */
+.badge {
+    font-weight: 500;
+    padding: 0.35em 0.65em;
+}
+
+/* --- Boutons --- */
+.btn {
+    border-radius: 0.5rem;
+    font-weight: 500;
+}
+
+.btn-group-sm .btn {
+    border-radius: 0.3rem;
+}
+
+/* --- Formulaires --- */
+.form-control, .form-select {
+    border-radius: 0.5rem;
+    border-color: #dee2e6;
+    padding: 0.5rem 0.75rem;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+
+/* --- Alertes --- */
+.alert {
+    border-radius: 0.75rem;
+    border: none;
+}
+
+/* --- Breadcrumb --- */
+.breadcrumb {
+    background-color: transparent;
+    padding: 0.5rem 0;
+    margin-bottom: 0;
+}
+
+.breadcrumb-item a {
+    color: #6c757d;
+    text-decoration: none;
+}
+
+.breadcrumb-item a:hover {
+    color: #0d6efd;
+}
+
+/* --- Pagination --- */
+.page-link {
+    border-radius: 0.5rem !important;
+    margin: 0 0.15rem;
+    border: none;
+    color: #6c757d;
+}
+
+.page-item.active .page-link {
+    background-color: #0d6efd;
+}
+
+/* --- Animations --- */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.card {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 60px !important;
+    }
+    .main-content {
+        margin-left: 60px !important;
+        width: calc(100% - 60px) !important;
+    }
+    .sidebar span, .sidebar h5, .sidebar hr {
+        display: none;
+    }
+    .sidebar .nav-link {
+        text-align: center;
+        padding: 0.5rem;
+    }
+    .sidebar .nav-link i {
+        margin-right: 0 !important;
+        font-size: 1.2rem;
+    }
+    .sidebar .btn {
+        font-size: 0;
+    }
+    .sidebar .btn i {
+        font-size: 1.2rem;
+    }
+}
+
+/* --- Statistiques --- */
+.stat-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card .stat-icon {
+    position: absolute;
+    right: -10px;
+    bottom: -10px;
+    font-size: 5rem;
+    opacity: 0.15;
+}
+
+/* --- Timeline pour interventions --- */
+.timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 0.5rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: #dee2e6;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -1.65rem;
+    top: 0.25rem;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #0d6efd;
+    border: 2px solid #fff;
+}
+
+/* --- Scrollbar personnalisée --- */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
+}

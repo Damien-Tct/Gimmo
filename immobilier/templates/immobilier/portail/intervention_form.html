@@ -1,0 +1,47 @@
+{% extends 'immobilier/portail/base_portail.html' %}
+{% load crispy_forms_tags %}
+{% block title %}Nouvelle demande d'intervention{% endblock %}
+
+{% block content %}
+<div class="portail-header mx-3">
+    <h4><i class="bi bi-plus-circle me-2"></i> Nouvelle demande d'intervention</h4>
+    <p class="mb-0">Décrivez le problème rencontré dans votre logement</p>
+</div>
+
+<div class="px-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle me-1"></i>
+                        Veuillez corriger les erreurs ci-dessous.
+                        <ul class="mb-0 mt-2">
+                        {% for field, errors in form.errors.items %}
+                            <li><strong>{{ field }}:</strong> {{ errors|join:", " }}</li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% for hidden_field in form.hidden_fields %}{{ hidden_field }}{% endfor %}
+                        <div class="row">
+                            <div class="col-md-12 mb-3">{{ form.titre|as_crispy_field }}</div>
+                            <div class="col-md-6 mb-3">{{ form.priorite|as_crispy_field }}</div>
+                            <div class="col-md-12 mb-3">{{ form.description|as_crispy_field }}</div>
+                        </div>
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-send me-1"></i> Envoyer ma demande
+                            </button>
+                            <a href="{% url 'immobilier:portail_interventions' %}" class="btn btn-secondary">Annuler</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

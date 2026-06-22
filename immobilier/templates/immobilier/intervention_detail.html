@@ -1,0 +1,140 @@
+{% extends 'immobilier/base.html' %}
+{% block title %}{{ intervention.titre }}{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="px-4 pt-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'immobilier:dashboard' %}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'immobilier:intervention_list' %}">Interventions</a></li>
+        <li class="breadcrumb-item active">{{ intervention.titre|truncatechars:30 }}</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3><i class="bi bi-tools me-2"></i> {{ intervention.titre }}</h3>
+    <div>
+        <a href="{% url 'immobilier:intervention_update' intervention.pk %}" class="btn btn-warning"><i class="bi bi-pencil"></i> Modifier</a>
+        <a href="{% url 'immobilier:intervention_delete' intervention.pk %}" class="btn btn-danger"><i class="bi bi-trash"></i> Supprimer</a>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white"><h6 class="mb-0">Description</h6></div>
+            <div class="card-body">
+                {{ intervention.description|linebreaks }}
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white"><h6 class="mb-0">Suivi</h6></div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <small class="text-muted d-block">Date de soumission</small>
+                        <strong>{{ intervention.date_soumission|date:"d/m/Y H:i" }}</strong>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted d-block">Date de planification</small>
+                        <strong>{{ intervention.date_planification|date:"d/m/Y H:i"|default:"Non planifiée" }}</strong>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted d-block">Date de début</small>
+                        <strong>{{ intervention.date_debut|date:"d/m/Y H:i"|default:"Non commencée" }}</strong>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted d-block">Date de fin</small>
+                        <strong>{{ intervention.date_fin|date:"d/m/Y H:i"|default:"Non terminée" }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prestataire -->
+        {% if intervention.prestataire_nom %}
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white"><h6 class="mb-0"><i class="bi bi-person-gear me-2"></i> Prestataire</h6></div>
+            <div class="card-body">
+                <p><strong>Nom :</strong> {{ intervention.prestataire_nom }}</p>
+                <p><strong>Tél :</strong> {{ intervention.prestataire_telephone|default:"—" }}</p>
+                <p><strong>Email :</strong> {{ intervention.prestataire_email|default:"—" }}</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-md-4">
+        <!-- Statut et priorité -->
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted d-block">Statut</small>
+                    <h5>
+                        {% if intervention.statut == 'TERM' %}
+                        <span class="badge bg-success">Terminé</span>
+                        {% elif intervention.statut == 'ENCO' %}
+                        <span class="badge bg-primary">En cours</span>
+                        {% elif intervention.statut == 'AFAI' %}
+                        <span class="badge bg-secondary">À faire</span>
+                        {% elif intervention.statut == 'ANNU' %}
+                        <span class="badge bg-dark">Annulé</span>
+                        {% else %}
+                        <span class="badge bg-warning text-dark">Différé</span>
+                        {% endif %}
+                    </h5>
+                </div>
+                <div>
+                    <small class="text-muted d-block">Priorité</small>
+                    <h5>
+                        {% if intervention.priorite == 'URG' %}
+                        <span class="badge bg-danger">Urgente</span>
+                        {% elif intervention.priorite == 'HAU' %}
+                        <span class="badge bg-warning text-dark">Haute</span>
+                        {% elif intervention.priorite == 'MOY' %}
+                        <span class="badge bg-info">Moyenne</span>
+                        {% else %}
+                        <span class="badge bg-secondary">Basse</span>
+                        {% endif %}
+                    </h5>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coûts -->
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white"><h6 class="mb-0"><i class="bi bi-cash me-2"></i> Coûts</h6></div>
+            <div class="card-body">
+                <p><strong>Estimé :</strong> {{ intervention.cout_estime }} €</p>
+                <p><strong>Réel :</strong> {{ intervention.cout_reel }} €</p>
+                {% if intervention.devis %}
+                <a href="{{ intervention.devis.url }}" target="_blank" class="btn btn-sm btn-outline-primary w-100 mb-1">Voir le devis</a>
+                {% endif %}
+                {% if intervention.facture %}
+                <a href="{{ intervention.facture.url }}" target="_blank" class="btn btn-sm btn-outline-success w-100">Voir la facture</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Bien -->
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white"><h6 class="mb-0"><i class="bi bi-building me-2"></i> Bien concerné</h6></div>
+            <div class="card-body">
+                <h6><a href="{% url 'immobilier:bien_detail' intervention.bien.pk %}">{{ intervention.bien.titre }}</a></h6>
+                <small class="text-muted">{{ intervention.bien.adresse }}, {{ intervention.bien.ville }}</small>
+            </div>
+        </div>
+
+        {% if intervention.locataire %}
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white"><h6 class="mb-0"><i class="bi bi-person-badge me-2"></i> Demandeur</h6></div>
+            <div class="card-body">
+                <h6><a href="{% url 'immobilier:locataire_detail' intervention.locataire.pk %}">{{ intervention.locataire.get_full_name }}</a></h6>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

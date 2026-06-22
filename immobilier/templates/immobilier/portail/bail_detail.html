@@ -1,0 +1,167 @@
+{% extends 'immobilier/portail/base_portail.html' %}
+{% block title %}Mon bail{% endblock %}
+
+{% block content %}
+<div class="portail-header mx-3">
+    <h4><i class="bi bi-file-text me-2"></i> Mon contrat de location</h4>
+    <p class="mb-0">Détails de votre bail</p>
+</div>
+
+<div class="px-4">
+    {% if bail %}
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0"><i class="bi bi-info-circle me-2"></i> Informations générales</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-2">
+                        <div class="col-5 text-muted">N° Contrat</div>
+                        <div class="col-7 fw-medium">{{ bail.numero_contrat }}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 text-muted">Type de bail</div>
+                        <div class="col-7 fw-medium">{{ bail.get_type_bail_display }}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 text-muted">Début</div>
+                        <div class="col-7 fw-medium">{{ bail.date_debut|date:"d/m/Y" }}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 text-muted">Fin</div>
+                        <div class="col-7 fw-medium">{{ bail.date_fin|date:"d/m/Y" }}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 text-muted">Durée</div>
+                        <div class="col-7 fw-medium">{{ bail.duree_mois }} mois</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 text-muted">Préavis</div>
+                        <div class="col-7 fw-medium">{{ bail.preavis_mois }} mois</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-5 text-muted">Tacite reconduction</div>
+                        <div class="col-7">{% if bail.tacite_reconduction %}<span class="badge bg-success">Oui</span>{% else %}<span class="badge bg-secondary">Non</span>{% endif %}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0"><i class="bi bi-cash me-2"></i> Aspects financiers</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-2">
+                        <div class="col-6 text-muted">Loyer mensuel</div>
+                        <div class="col-6 fw-medium text-end">{{ bail.loyer_mensuel }} €</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-6 text-muted">Charges mensuelles</div>
+                        <div class="col-6 fw-medium text-end">{{ bail.charges_mensuelles }} €</div>
+                    </div>
+                    <hr>
+                    <div class="row mb-3">
+                        <div class="col-6"><strong>Total mensuel</strong></div>
+                        <div class="col-6 fw-bold text-end text-primary">{{ bail.loyer_total }} €</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-6 text-muted">Dépôt de garantie</div>
+                        <div class="col-6 fw-medium text-end">{{ bail.depot_garantie }} €</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-6 text-muted">Jour de paiement</div>
+                        <div class="col-6 fw-medium text-end">Le {{ bail.jour_paiement }}</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-6 text-muted">Modalité</div>
+                        <div class="col-6 fw-medium text-end">{{ bail.get_modalite_paiement_display }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Documents du bail -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0"><i class="bi bi-file-earmark me-2"></i> Documents du bail</h6>
+                </div>
+                <div class="card-body">
+                    {% if bail.etat_lieux_entree %}
+                    <a href="{{ bail.etat_lieux_entree.url }}" target="_blank" class="btn btn-outline-secondary btn-sm w-100 mb-2">
+                        <i class="bi bi-file-pdf me-1"></i> État des lieux d'entrée
+                    </a>
+                    {% endif %}
+                    {% if bail.etat_lieux_sortie %}
+                    <a href="{{ bail.etat_lieux_sortie.url }}" target="_blank" class="btn btn-outline-secondary btn-sm w-100 mb-2">
+                        <i class="bi bi-file-pdf me-1"></i> État des lieux de sortie
+                    </a>
+                    {% endif %}
+                    {% if not bail.etat_lieux_entree and not bail.etat_lieux_sortie %}
+                    <p class="text-muted mb-0">Aucun document attaché au bail</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Derniers paiements -->
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0"><i class="bi bi-clock-history me-2"></i> Historique des paiements</h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr><th>Date</th><th>Période</th><th>Montant</th><th>Statut</th><th>Quittance</th></tr>
+                            </thead>
+                            <tbody>
+                                {% for p in paiements %}
+                                <tr>
+                                    <td>{{ p.date_paiement|date:"d/m/Y" }}</td>
+                                    <td><small>{{ p.date_periode_debut|date:"d/m/Y" }} → {{ p.date_periode_fin|date:"d/m/Y" }}</small></td>
+                                    <td>{{ p.montant }} €</td>
+                                    <td>
+                                        {% if p.statut == 'VALID' %}
+                                        <span class="badge bg-success">Payé</span>
+                                        {% elif p.statut == 'EN_RETARD' %}
+                                        <span class="badge bg-danger">Impayé</span>
+                                        {% elif p.statut == 'EN_ATTENTE' %}
+                                        <span class="badge bg-warning text-dark">En attente</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">Annulé</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if p.quittance_generee and p.quittance_pdf %}
+                                        <a href="{{ p.quittance_pdf.url }}" target="_blank" class="btn btn-sm btn-outline-success"><i class="bi bi-file-pdf"></i> Quittance</a>
+                                        {% else %}
+                                        <span class="text-muted">—</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="5" class="text-center text-muted">Aucun paiement</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="card border-0 shadow-sm">
+        <div class="card-body text-center py-5">
+            <i class="bi bi-file-text fs-1 text-muted"></i>
+            <h5 class="mt-3">Aucun bail actif</h5>
+            <p class="text-muted">Vous n'avez pas de contrat de location actif pour le moment.</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

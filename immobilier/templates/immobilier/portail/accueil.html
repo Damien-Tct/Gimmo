@@ -1,0 +1,276 @@
+{% extends 'immobilier/portail/base_portail.html' %}
+{% load static %}
+{% block title %}Accueil - Espace Locataire{% endblock %}
+
+{% block content %}
+<div class="portail-header mx-3">
+    <h4><i class="bi bi-person-circle me-2"></i> Bonjour {{ locataire.prenom|default:user.first_name }}</h4>
+    <p class="mb-0">Bienvenue dans votre espace locataire</p>
+</div>
+
+<div class="px-4">
+    {% if paiements_en_attente %}
+    <div class="alert alert-warning d-flex align-items-center justify-content-between flex-wrap gap-2" role="alert">
+        <div>
+            <i class="bi bi-exclamation-triangle me-2 fs-5"></i>
+            <strong>{{ paiements_en_attente|length }} paiement(s) en attente</strong>
+            — Montant total dû : <strong>{{ total_du }} €</strong>
+        </div>
+        <a href="{% url 'immobilier:portail_paiements' %}" class="btn btn-warning btn-sm">
+            <i class="bi bi-currency-euro me-1"></i> Voir mes paiements
+        </a>
+    </div>
+    {% endif %}
+
+    <div class="row g-3">
+        {% if bien %}
+        <!-- Résumé du bien -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0"><i class="bi bi-building me-2"></i> Mon logement</h6>
+                </div>
+                <div class="card-body">
+                    <h5>{{ bien.titre }}</h5>
+                    <small class="text-muted d-block">{{ bien.get_type_bien_display }}</small>
+                    <small class="text-muted d-block">{{ bien.adresse }}, {{ bien.code_postal }} {{ bien.ville }}</small>
+                    <hr>
+                    <small class="d-block"><i class="bi bi-arrows-angle-expand me-1"></i> Surface : {{ bien.surface_habitable }} m²</small>
+                    <small class="d-block"><i class="bi bi-door-open me-1"></i> Pièces : {{ bien.nombre_pieces }}</small>
+                    {% if bien.etage %}<small class="d-block"><i class="bi bi-layers me-1"></i> Étage : {{ bien.etage }}{% if bien.nombre_etages_total %}/{{ bien.nombre_etages_total }}{% endif %}</small>{% endif %}
+                    {% if bien.meuble %}<span class="badge bg-info mt-1">Meublé</span>{% endif %}
+                    {% if bien.ascenseur %}<span class="badge bg-secondary mt-1">Ascenseur</span>{% endif %}
+                    {% if bien.balcon %}<span class="badge bg-success mt-1">Balcon</span>{% endif %}
+                    {% if bien.parking %}<span class="badge bg-warning text-dark mt-1">Parking</span>{% endif %}
+                    {% if bien.photo_principale %}
+                    <img src="{{ bien.photo_principale.url }}" class="img-fluid rounded mt-2" alt="Photo">
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Mon bail -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0"><i class="bi bi-file-text me-2"></i> Mon bail</h6>
+                </div>
+                <div class="card-body">
+                    {% if bail_actif %}
+                    <p><strong>N° contrat :</strong> {{ bail_actif.numero_contrat }}</p>
+                    <p><strong>Début :</strong> {{ bail_actif.date_debut|date:"d/m/Y" }}</p>
+                    <p><strong>Fin :</strong> {{ bail_actif.date_fin|date:"d/m/Y" }}</p>
+                    <p><strong>Loyer :</strong> {{ bail_actif.loyer_mensuel }} € / mois</p>
+                    <p><strong>Charges :</strong> {{ bail_actif.charges_mensuelles }} € / mois</p>
+                    <a href="{% url 'immobilier:portail_bail' %}" class="btn btn-outline-primary btn-sm">Voir le détail</a>
+                    {% else %}
+                    <p class="text-muted">Aucun bail actif</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Résumé financier -->
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0"><i class="bi bi-currency-euro me-2"></i> Mes paiements</h6>
+                </div>
+                <div class="card-body">
+                    {% if stats_paiements %}
+                    <div class="row text-center g-2">
+                        <div class="col-6">
+                            <div class="p-2 bg-success text-white rounded">
+                                <small>Payés</small>
+                                <h5 class="mb-0">{{ stats_paiements.nb_valid }}</h5>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-2 bg-danger text-white rounded">
+                                <small>Impayés</small>
+                                <h5 class="mb-0">{{ stats_paiements.nb_impaye }}</h5>
+                            </div>
+                        </div>
+                        <div class="col-12 mt-2">
+                            <strong>Total payé : {{ stats_paiements.total_paye|default:"0" }} €</strong>
+                        </div>
+                        {% if prochain_paiement %}
+                        <div class="col-12 mt-1">
+                            <small class="text-muted">Prochain loyer : <strong>{{ prochain_paiement }} €</strong></small>
+                        </div>
+                        {% endif %}
+                        {% if reste_a_payer and reste_a_payer > 0 %}
+                        <div class="col-12 mt-1">
+                            <small class="text-danger">Reste dû ce mois : <strong>{{ reste_a_payer }} €</strong></small>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <a href="{% url 'immobilier:portail_paiements' %}" class="btn btn-outline-primary btn-sm w-100 mt-2">Voir l'historique</a>
+                    {% else %}
+                    <p class="text-muted">Aucun paiement</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Propriétaire -->
+        {% if proprietaire %}
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0"><i class="bi bi-person me-2"></i> Mon propriétaire</h6>
+                </div>
+                <div class="card-body">
+                    <h5>{{ proprietaire.prenom }} {{ proprietaire.nom }}</h5>
+                    {% if proprietaire.email %}
+                    <p><i class="bi bi-envelope me-1"></i> {{ proprietaire.email }}</p>
+                    {% endif %}
+                    {% if proprietaire.telephone %}
+                    <p><i class="bi bi-telephone me-1"></i> {{ proprietaire.telephone }}</p>
+                    {% endif %}
+                    {% if proprietaire.adresse %}
+                    <small class="text-muted">{{ proprietaire.adresse }}, {{ proprietaire.code_postal }} {{ proprietaire.ville }}</small>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Garant -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0"><i class="bi bi-shield me-2"></i> Mon garant</h6>
+                </div>
+                <div class="card-body">
+                    {% for garant in garants %}
+                    <h5>{{ garant.prenom }} {{ garant.nom }}</h5>
+                    {% if garant.email %}<p><i class="bi bi-envelope me-1"></i> {{ garant.email }}</p>{% endif %}
+                    {% if garant.telephone %}<p><i class="bi bi-telephone me-1"></i> {{ garant.telephone }}</p>{% endif %}
+                    {% if garant.revenus_mensuels %}<p><i class="bi bi-currency-euro me-1"></i> {{ garant.revenus_mensuels }} € / mois</p>{% endif %}
+                    {% empty %}
+                    <p class="text-muted">Aucun garant enregistré</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Interventions -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0"><i class="bi bi-tools me-2"></i> Mes interventions</h6>
+                    <a href="{% url 'immobilier:portail_intervention_create' %}" class="btn btn-sm btn-primary">
+                        <i class="bi bi-plus-lg"></i> Nouvelle demande
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for intervention in interventions %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ intervention.titre|truncatechars:35 }}</strong>
+                                <br><small class="text-muted">{{ intervention.date_soumission|date:"d/m/Y" }}</small>
+                            </div>
+                            <span class="badge bg-{% if intervention.statut == 'TERM' %}success{% elif intervention.statut == 'ENCO' %}primary{% elif intervention.statut == 'AFAI' %}secondary{% else %}warning{% endif %}">
+                                {{ intervention.get_statut_display }}
+                            </span>
+                        </div>
+                        {% empty %}
+                        <div class="list-group-item text-center text-muted">Aucune intervention</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Documents -->
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0"><i class="bi bi-folder me-2"></i> Derniers documents</h6>
+                    <a href="{% url 'immobilier:portail_documents' %}" class="btn btn-sm btn-outline-primary">Voir tout</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% if documents_bail %}
+                        {% for doc_bail in documents_bail %}
+                        <a href="{{ doc_bail.fichier }}" target="_blank" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center bg-light">
+                            <span><i class="bi bi-file-earmark-text me-2 text-primary"></i> {{ doc_bail.titre }}</span>
+                            <small class="text-muted">{{ doc_bail.date|date:"d/m/Y"|default:"" }}</small>
+                        </a>
+                        {% endfor %}
+                        {% endif %}
+                        {% for doc in documents %}
+                        <a href="{{ doc.fichier.url }}" target="_blank" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            <span><i class="bi bi-file-earmark me-2"></i> {{ doc.titre }}</span>
+                            <small class="text-muted">{{ doc.get_categorie_display }}</small>
+                        </a>
+                        {% empty %}
+                        <div class="list-group-item text-center text-muted">Aucun document</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tableau des derniers paiements -->
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0"><i class="bi bi-clock-history me-2"></i> Derniers paiements</h6>
+                    <a href="{% url 'immobilier:portail_paiements' %}" class="btn btn-sm btn-outline-primary">Voir tout</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Période</th>
+                                    <th>Montant</th>
+                                    <th>Mode</th>
+                                    <th>Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for p in derniers_paiements %}
+                                <tr>
+                                    <td>{{ p.date_paiement|date:"d/m/Y" }}</td>
+                                    <td>{{ p.date_periode_debut|date:"M Y"|default:"—" }}</td>
+                                    <td>{{ p.montant }} €</td>
+                                    <td>{{ p.get_mode_paiement_display }}</td>
+                                    <td>
+                                        {% if p.statut == 'VALID' %}
+                                        <span class="badge bg-success">Payé</span>
+                                        {% elif p.statut == 'EN_RETARD' %}
+                                        <span class="badge bg-danger">En retard</span>
+                                        {% else %}
+                                        <span class="badge bg-warning text-dark">En attente</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="5" class="text-center text-muted py-3">Aucun paiement</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% else %}
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-house-door fs-1 text-muted"></i>
+                    <h5 class="mt-3">Aucun logement associé</h5>
+                    <p class="text-muted">Votre compte n'est pas encore lié à un logement. Contactez votre gestionnaire.</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

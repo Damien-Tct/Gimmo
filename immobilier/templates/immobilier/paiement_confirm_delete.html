@@ -1,0 +1,32 @@
+{% extends 'immobilier/base.html' %}
+{% block title %}Supprimer un paiement{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center p-5">
+                <i class="bi bi-exclamation-triangle text-danger fs-1 mb-3 d-block"></i>
+                <h4>Confirmer la suppression</h4>
+                <p class="text-muted">
+                    Êtes-vous sûr de vouloir supprimer ce paiement ?
+                </p>
+                <table class="table table-bordered text-start mt-3">
+                    <tr><th>Locataire</th><td>{{ paiement.locataire.get_full_name }}</td></tr>
+                    <tr><th>Bail</th><td>{{ paiement.bail.numero_contrat }}</td></tr>
+                    <tr><th>Montant</th><td>{{ paiement.montant }} €</td></tr>
+                    <tr><th>Période</th><td>{{ paiement.date_periode_debut|date:"d/m/Y" }} → {{ paiement.date_periode_fin|date:"d/m/Y" }}</td></tr>
+                    <tr><th>Statut</th><td>{{ paiement.get_statut_display }}</td></tr>
+                </table>
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash me-1"></i> Supprimer définitivement
+                    </button>
+                    <a href="javascript:history.back()" class="btn btn-secondary">Annuler</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

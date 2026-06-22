@@ -1,0 +1,92 @@
+{% extends 'immobilier/base.html' %}
+{% block title %}Interventions{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="px-4 pt-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'immobilier:dashboard' %}">Dashboard</a></li>
+        <li class="breadcrumb-item active">Interventions</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3><i class="bi bi-tools me-2"></i> Interventions</h3>
+    <a href="{% url 'immobilier:intervention_create' %}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Nouvelle intervention</a>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Priorité</th>
+                        <th>Titre</th>
+                        <th>Bien</th>
+                        <th>Locataire</th>
+                        <th>Date</th>
+                        <th>Statut</th>
+                        <th>Coût</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for intervention in interventions %}
+                    <tr class="{% if intervention.priorite == 'URG' %}table-danger{% elif intervention.priorite == 'HAU' %}table-warning{% endif %}">
+                        <td>
+                            {% if intervention.priorite == 'URG' %}
+                            <span class="badge bg-danger">Urgente</span>
+                            {% elif intervention.priorite == 'HAU' %}
+                            <span class="badge bg-warning text-dark">Haute</span>
+                            {% elif intervention.priorite == 'MOY' %}
+                            <span class="badge bg-info">Moyenne</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Basse</span>
+                            {% endif %}
+                        </td>
+                        <td><a href="{% url 'immobilier:intervention_detail' intervention.pk %}" class="text-decoration-none fw-medium">{{ intervention.titre|truncatechars:40 }}</a></td>
+                        <td><a href="{% url 'immobilier:bien_detail' intervention.bien.pk %}">{{ intervention.bien.titre|truncatechars:20 }}</a></td>
+                        <td>{{ intervention.locataire|default:"—" }}</td>
+                        <td><small>{{ intervention.date_soumission|date:"d/m/Y" }}</small></td>
+                        <td>
+                            {% if intervention.statut == 'TERM' %}
+                            <span class="badge bg-success">Terminé</span>
+                            {% elif intervention.statut == 'ENCO' %}
+                            <span class="badge bg-primary">En cours</span>
+                            {% elif intervention.statut == 'AFAI' %}
+                            <span class="badge bg-secondary">À faire</span>
+                            {% elif intervention.statut == 'ANNU' %}
+                            <span class="badge bg-dark">Annulé</span>
+                            {% else %}
+                            <span class="badge bg-warning text-dark">Différé</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if intervention.cout_reel %}{{ intervention.cout_reel }} €{% elif intervention.cout_estime %}{{ intervention.cout_estime }} €*{% else %}—{% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'immobilier:intervention_detail' intervention.pk %}" class="btn btn-outline-primary"><i class="bi bi-eye"></i></a>
+                                <a href="{% url 'immobilier:intervention_update' intervention.pk %}" class="btn btn-outline-secondary"><i class="bi bi-pencil"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="8" class="text-center py-4 text-muted">Aucune intervention trouvée</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% if is_paginated %}
+<nav class="mt-4"><ul class="pagination justify-content-center">
+    {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Précédent</a></li>{% endif %}
+    <li class="page-item active"><span class="page-link">{{ page_obj.number }}/{{ page_obj.paginator.num_pages }}</span></li>
+    {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Suivant</a></li>{% endif %}
+</ul></nav>
+{% endif %}
+{% endblock %}

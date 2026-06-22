@@ -1,0 +1,87 @@
+{% extends 'immobilier/base.html' %}
+{% block title %}Documents{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="px-4 pt-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'immobilier:dashboard' %}">Dashboard</a></li>
+        <li class="breadcrumb-item active">Documents</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3><i class="bi bi-folder me-2"></i> Documents</h3>
+    <a href="{% url 'immobilier:document_create' %}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Ajouter un document</a>
+</div>
+
+<!-- Filtres -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-2">
+            <div class="col-md-4">
+                <input type="text" name="q" class="form-control" placeholder="Rechercher..." value="{{ recherche }}">
+            </div>
+            <div class="col-md-3">
+                <select name="categorie" class="form-select">
+                    <option value="">Toutes catégories</option>
+                    {% for code, label in doc_categories %}
+                    <option value="{{ code }}" {% if categorie_courante == code %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i></button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Titre</th>
+                        <th>Catégorie</th>
+                        <th>Lié à</th>
+                        <th>Date</th>
+                        <th>Fichier</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for doc in documents %}
+                    <tr>
+                        <td>{{ doc.titre }}</td>
+                        <td><span class="badge bg-info">{{ doc.get_categorie_display }}</span></td>
+                        <td>
+                            {% if doc.bien %}<small>Bien: {{ doc.bien.titre|truncatechars:20 }}</small><br>{% endif %}
+                            {% if doc.locataire %}<small>Loc.: {{ doc.locataire }}</small><br>{% endif %}
+                            {% if doc.proprietaire %}<small>Prop.: {{ doc.proprietaire }}</small>{% endif %}
+                        </td>
+                        <td><small>{{ doc.date_creation|date:"d/m/Y" }}</small></td>
+                        <td><a href="{{ doc.fichier.url }}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="bi bi-download"></i></a></td>
+                        <td>
+                            <a href="{% url 'immobilier:document_delete' doc.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="text-center py-4 text-muted">Aucun document trouvé</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% if is_paginated %}
+<nav class="mt-4"><ul class="pagination justify-content-center">
+    {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Précédent</a></li>{% endif %}
+    <li class="page-item active"><span class="page-link">{{ page_obj.number }}/{{ page_obj.paginator.num_pages }}</span></li>
+    {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Suivant</a></li>{% endif %}
+</ul></nav>
+{% endif %}
+{% endblock %}

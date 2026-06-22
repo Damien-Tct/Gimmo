@@ -1,0 +1,131 @@
+{% extends 'immobilier/base.html' %}
+{% block title %}{{ proprietaire.get_full_name }}{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="px-4 pt-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'immobilier:dashboard' %}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'immobilier:proprietaire_list' %}">Propriétaires</a></li>
+        <li class="breadcrumb-item active">{{ proprietaire.get_full_name }}</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3><i class="bi bi-person me-2"></i> {{ proprietaire.get_full_name }}</h3>
+    <div>
+        <a href="{% url 'immobilier:proprietaire_update' proprietaire.pk %}" class="btn btn-warning">
+            <i class="bi bi-pencil"></i> Modifier
+        </a>
+        <a href="{% url 'immobilier:proprietaire_delete' proprietaire.pk %}" class="btn btn-danger">
+            <i class="bi bi-trash"></i> Supprimer
+        </a>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white">
+                <h6 class="mb-0"><i class="bi bi-person-badge me-2"></i> Coordonnées</h6>
+            </div>
+            <div class="card-body">
+                <p><strong>Type :</strong> {{ proprietaire.get_type_personne_display }}</p>
+                {% if proprietaire.raison_sociale %}
+                <p><strong>Raison sociale :</strong> {{ proprietaire.raison_sociale }}</p>
+                <p><strong>SIRET :</strong> {{ proprietaire.siret }}</p>
+                {% endif %}
+                <p><strong>Email :</strong> {{ proprietaire.email }}</p>
+                <p><strong>Tél :</strong> {{ proprietaire.telephone }}</p>
+                {% if proprietaire.telephone_secondaire %}
+                <p><strong>Tél 2 :</strong> {{ proprietaire.telephone_secondaire }}</p>
+                {% endif %}
+                <p><strong>Adresse :</strong><br>
+                {{ proprietaire.adresse }}<br>
+                {{ proprietaire.code_postal }} {{ proprietaire.ville }}</p>
+                <p><strong>IBAN :</strong> {{ proprietaire.iban|default:"—" }}</p>
+                <p><strong>BIC :</strong> {{ proprietaire.bic|default:"—" }}</p>
+            </div>
+        </div>
+
+        <!-- Documents -->
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h6 class="mb-0"><i class="bi bi-folder me-2"></i> Documents</h6>
+                <a href="{% url 'immobilier:document_create' %}?proprietaire={{ proprietaire.pk }}" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-plus-lg"></i>
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% for doc in documents %}
+                    <a href="{{ doc.fichier.url }}" target="_blank" class="list-group-item list-group-item-action">
+                        {{ doc.titre }}<br><small class="text-muted">{{ doc.get_categorie_display }}</small>
+                    </a>
+                    {% empty %}
+                    <div class="list-group-item text-center text-muted">Aucun document</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <!-- Biens du propriétaire -->
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h6 class="mb-0"><i class="bi bi-building me-2"></i> Biens ({{ biens|length }})</h6>
+                <a href="{% url 'immobilier:bien_create' %}" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-plus-lg"></i> Ajouter un bien
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Titre</th>
+                                <th>Type</th>
+                                <th>Ville</th>
+                                <th>Statut</th>
+                                <th>Loyer</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for bien in biens %}
+                            <tr>
+                                <td><a href="{% url 'immobilier:bien_detail' bien.pk %}">{{ bien.titre }}</a></td>
+                                <td>{{ bien.get_type_bien_display }}</td>
+                                <td>{{ bien.ville }}</td>
+                                <td><span class="badge bg-{% if bien.statut == 'LOUE' %}success{% elif bien.statut == 'DISP' %}info{% else %}warning{% endif %}">{{ bien.get_statut_display }}</span></td>
+                                <td>{{ bien.loyer_mensuel_indicatif }} €</td>
+                                <td>
+                                    <a href="{% url 'immobilier:bien_detail' bien.pk %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="6" class="text-center text-muted">Aucun bien</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Revenus -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white">
+                <h6 class="mb-0"><i class="bi bi-currency-euro me-2"></i> Revenus totaux</h6>
+            </div>
+            <div class="card-body">
+                <h3 class="text-primary">{{ revenus_total }} €</h3>
+                <small class="text-muted">Revenus totaux des loyers perçus</small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

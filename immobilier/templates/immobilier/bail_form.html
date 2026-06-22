@@ -1,0 +1,84 @@
+{% extends 'immobilier/base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}{% if bail %}Modifier{% else %}Ajouter{% endif %} un bail{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="px-4 pt-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'immobilier:dashboard' %}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'immobilier:bail_list' %}">Baux</a></li>
+        <li class="breadcrumb-item active">{% if bail %}Modifier{% else %}Ajouter{% endif %}</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white">
+        <h5 class="mb-0">{% if bail %}<i class="bi bi-pencil me-2"></i> Modifier le bail{% else %}<i class="bi bi-plus-lg me-2"></i> Nouveau bail{% endif %}</h5>
+    </div>
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <h6 class="text-primary mb-3">Parties et bien</h6>
+            <div class="row">
+                <div class="col-md-4">{{ form.bien|as_crispy_field }}</div>
+                <div class="col-md-4">{{ form.locataire|as_crispy_field }}</div>
+                <div class="col-md-4">{{ form.type_bail|as_crispy_field }}</div>
+                <div class="col-md-6">{{ form.colocataires|as_crispy_field }}</div>
+            </div>
+
+            <h6 class="text-primary mb-3 mt-4">Dates et durée</h6>
+            <div class="row">
+                <div class="col-md-3">{{ form.date_debut|as_crispy_field }}</div>
+                <div class="col-md-3">{{ form.date_fin|as_crispy_field }}</div>
+                <div class="col-md-2">{{ form.duree_mois|as_crispy_field }}</div>
+                <div class="col-md-2">{{ form.preavis_mois|as_crispy_field }}</div>
+                <div class="col-md-2">{{ form.tacite_reconduction|as_crispy_field }}</div>
+            </div>
+
+            <h6 class="text-primary mb-3 mt-4">Aspects financiers</h6>
+            <div class="row">
+                <div class="col-md-3">{{ form.loyer_mensuel|as_crispy_field }}</div>
+                <div class="col-md-3">{{ form.charges_mensuelles|as_crispy_field }}</div>
+                <div class="col-md-2">{{ form.provision_charges|as_crispy_field }}</div>
+                <div class="col-md-2">{{ form.depot_garantie|as_crispy_field }}</div>
+                <div class="col-md-2">{{ form.modalite_paiement|as_crispy_field }}</div>
+                <div class="col-md-2">{{ form.jour_paiement|as_crispy_field }}</div>
+                <div class="col-md-2">{{ form.depot_garantie_encaisse|as_crispy_field }}</div>
+                <div class="col-md-2">{{ form.depot_garantie_restitué|as_crispy_field }}</div>
+                <div class="col-md-4">{{ form.indice_revision|as_crispy_field }}</div>
+                <div class="col-md-3">{{ form.date_prochaine_revision|as_crispy_field }}</div>
+                <div class="col-md-3">{{ form.montant_annuel_revision|as_crispy_field }}</div>
+            </div>
+
+            <h6 class="text-primary mb-3 mt-4">État des lieux et assurances</h6>
+            <div class="row">
+                <div class="col-md-3">{{ form.date_etat_lieux_entree|as_crispy_field }}</div>
+                <div class="col-md-3">{{ form.etat_lieux_entree|as_crispy_field }}</div>
+                <div class="col-md-3">{{ form.date_etat_lieux_sortie|as_crispy_field }}</div>
+                <div class="col-md-3">{{ form.etat_lieux_sortie|as_crispy_field }}</div>
+                <div class="col-md-3">{{ form.assurance_locataire|as_crispy_field }}</div>
+                <div class="col-md-3">{{ form.assurance_proprietaire|as_crispy_field }}</div>
+                <div class="col-md-3">{{ form.clause_resolutoire|as_crispy_field }}</div>
+                <div class="col-md-3">{{ form.solidarite_colocataires|as_crispy_field }}</div>
+            </div>
+
+            <h6 class="text-primary mb-3 mt-4">Statut et résiliation</h6>
+            <div class="row">
+                <div class="col-md-3">{{ form.statut_bail|as_crispy_field }}</div>
+                <div class="col-md-3">{{ form.date_resiliation|as_crispy_field }}</div>
+                <div class="col-md-6">{{ form.motif_resiliation|as_crispy_field }}</div>
+                <div class="col-md-12">{{ form.notes|as_crispy_field }}</div>
+            </div>
+            {{ form.actif }}
+            {{ form.resiliation }}
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> {% if bail %}Enregistrer{% else %}Créer le bail{% endif %}</button>
+                <a href="{% url 'immobilier:bail_list' %}" class="btn btn-secondary">Annuler</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

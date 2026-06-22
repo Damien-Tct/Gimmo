@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Gestion Immobilière{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="{% static 'immobilier/css/style.css' %}">
+    <style>
+        body { transition: background 0.3s, color 0.3s; }
+        
+        .card, .list-group-item, .table, .modal-content { transition: background 0.3s, color 0.3s; }
+    </style>
+    {% block extra_head %}{% endblock %}
+<style>
+        position: fixed; bottom: 0; left: 0; right: 0; z-index: 9999;
+        background: #1a1a2e; color: #fff; padding: 1rem 2rem;
+        display: none; box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+    }
+</style>
+</head>
+<body>
+    <!-- Sidebar (fixed left) -->
+    <nav class="sidebar bg-dark text-white p-3" style="height: 100vh;">
+        <div class="d-flex align-items-center mb-4">
+            <i class="bi bi-building fs-3 me-2"></i>
+            <h5 class="mb-0">Gestion Immo</h5>
+        </div>
+        <hr class="text-secondary">
+        <ul class="nav flex-column">
+            {% if user.is_staff or perms.immobilier.view_bienimmobilier %}
+            <li class="nav-item">
+                <a class="nav-link text-white {% if request.resolver_match.url_name == 'dashboard' %}active bg-primary rounded{% endif %}" href="{% url 'immobilier:dashboard' %}">
+                    <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item mt-2">
+                <a class="nav-link text-white {% if 'bien' in request.resolver_match.url_name %}active bg-primary rounded{% endif %}" href="{% url 'immobilier:bien_list' %}">
+                    <i class="bi bi-building me-2"></i> Biens
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white {% if 'proprietaire' in request.resolver_match.url_name %}active bg-primary rounded{% endif %}" href="{% url 'immobilier:proprietaire_list' %}">
+                    <i class="bi bi-people me-2"></i> Propriétaires
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white {% if 'locataire' in request.resolver_match.url_name %}active bg-primary rounded{% endif %}" href="{% url 'immobilier:locataire_list' %}">
+                    <i class="bi bi-person-badge me-2"></i> Locataires
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white {% if 'bail' in request.resolver_match.url_name %}active bg-primary rounded{% endif %}" href="{% url 'immobilier:bail_list' %}">
+                    <i class="bi bi-file-text me-2"></i> Baux
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white {% if 'document' in request.resolver_match.url_name %}active bg-primary rounded{% endif %}" href="{% url 'immobilier:document_list' %}">
+                    <i class="bi bi-folder me-2"></i> Documents
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white {% if 'intervention' in request.resolver_match.url_name %}active bg-primary rounded{% endif %}" href="{% url 'immobilier:intervention_list' %}">
+                    <i class="bi bi-tools me-2"></i> Interventions
+                </a>
+            </li>
+            <!-- Séparateur visuel -->
+            <hr class="text-secondary my-2">
+            <li class="nav-item mb-1">
+                <small class="text-secondary ms-2">FINANCES</small>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white py-1 {% if 'appels_loyers' in request.resolver_match.url_name %}active bg-primary rounded{% endif %}" href="{% url 'immobilier:appels_loyers' %}">
+                    <i class="bi bi-send me-2"></i> Appels de loyer
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-white py-1 {% if 'paiement' in request.resolver_match.url_name and not 'portail' in request.resolver_match.url_name %}active bg-primary rounded{% endif %}" href="{% url 'immobilier:paiement_list' %}">
+                    <i class="bi bi-graph-up me-2"></i> Suivi des paiements
+                </a>
+            </li>
+            {% else %}
+            <!-- Menu simplifié pour un locataire non-admin -->
+            <li class="nav-item">
+                <a class="nav-link text-white" href="{% url 'immobilier:portail_accueil' %}">
+                    <i class="bi bi-house-door me-2"></i> Mon espace
+                </a>
+            </li>
+            {% endif %}
+        <hr class="text-secondary">
+        <div class="mt-auto">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-person-circle fs-4 me-2"></i>
+                <small>{{ user.get_full_name|default:user.username }}</small>
+            </div>
+            {% if user.is_staff or perms.immobilier.view_bienimmobilier %}
+            <a href="{% url 'admin:index' %}" class="btn btn-outline-light btn-sm w-100 mt-2">
+                <i class="bi bi-gear me-1"></i> Administration
+            </a>
+            {% endif %}
+            <form method="post" action="{% url 'logout' %}" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-danger btn-sm w-100 mt-1">
+                    <i class="bi bi-box-arrow-right me-1"></i> Déconnexion
+                </button>
+            </form>
+        </div>
+    </nav>
+
+    <!-- Main Content (décalé à droite par le margin-left du CSS) -->
+    <div class="main-content">
+        <!-- Alertes globales -->
+        {% if global_alerts %}
+        <div class="px-4 pt-3">
+            {% for alert in global_alerts %}
+            <div class="alert alert-{{ alert.type }} alert-dismissible fade show d-flex align-items-center" role="alert">
+                <i class="{{ alert.icon }} me-2"></i>
+                <span>{{ alert.message }}</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Messages Django -->
+        {% if messages %}
+        <div class="px-4 pt-3">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Breadcrumb -->
+        {% block breadcrumb %}{% endblock %}
+
+        <!-- Content -->
+        <div class="p-4">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="{% static 'immobilier/js/main.js' %}"></script>
+
+<script>
+// ======================= GESTION DES COOKIES =======================
+(function() {
+    if (consent === 'false') {
+        var chartScript = document.getElementById('chartjs-script');
+        if (chartScript) chartScript.remove();
+    }
+        if (banner) banner.classList.add('show');
+    }
+})();
+}
+    var chartScript = document.getElementById('chartjs-script');
+    if (chartScript) chartScript.remove();
+}
+</script>
+    {% block extra_js %}{% endblock %}
+<div class="text-center text-muted py-3 small border-top" style="background:var(--bs-body-bg, #f8f9fa);">
+    <a href="{% url 'immobilier:rgpd' %}" class="text-decoration-none me-3">
+        <i class="bi bi-shield-check me-1"></i> Mentions légales & RGPD
+    </a>
+    &copy; {% now "Y" %} Gestion Immo
+</div>
+</body>
+</html>

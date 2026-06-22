@@ -1,0 +1,291 @@
+{% extends 'immobilier/base.html' %}
+{% load static %}
+{% block title %}Dashboard - Gestion Immobilière{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-speedometer2 me-2"></i> Dashboard</h2>
+    <small class="text-muted">{% now "l d F Y" %}</small>
+</div>
+
+<!-- Cartes statistiques - rangée 1 -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-1">Biens</h6>
+                        <h3 class="mb-0">{{ stats.total_biens }}</h3>
+                    </div>
+                    <i class="bi bi-building fs-1 opacity-50"></i>
+                </div>
+                <small class="opacity-75">{{ stats.biens_loues }} loués / {{ stats.biens_disponibles }} disponibles</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-1">Taux d'occupation</h6>
+                        <h3 class="mb-0">{{ stats.taux_occupation }}%</h3>
+                    </div>
+                    <i class="bi bi-graph-up-arrow fs-1 opacity-50"></i>
+                </div>
+                <small class="opacity-75">{{ stats.baux_actifs }} baux actifs</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-1">Paiements du mois</h6>
+                        <h3 class="mb-0">{{ stats.paiements_mois }} €</h3>
+                    </div>
+                    <i class="bi bi-currency-euro fs-1 opacity-50"></i>
+                </div>
+                <small class="opacity-75">{{ stats.paiements_mois_count }} paiements</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-1">Impayés</h6>
+                        <h3 class="mb-0">{{ stats.montant_impayes }} €</h3>
+                    </div>
+                    <i class="bi bi-exclamation-triangle fs-1 opacity-50"></i>
+                </div>
+                <small class="opacity-75">{{ stats.total_impayes }} impayés</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cartes statistiques - rangée 2 -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h6 class="card-title text-muted">Propriétaires</h6>
+                <h3>{{ stats.total_proprietaires }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h6 class="card-title text-muted">Locataires</h6>
+                <h3>{{ stats.total_locataires }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h6 class="card-title text-muted">Revenus annuels</h6>
+                <h3>{{ stats.revenus_annuels }} €</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h6 class="card-title text-muted">Interventions en cours</h6>
+                <h3>{{ stats.interventions_en_cours }}</h3>
+                {% if stats.interventions_urgentes %}
+                <span class="badge bg-danger">{{ stats.interventions_urgentes }} urgentes</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Derniers paiements + Baux expirant -->
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h6 class="mb-0"><i class="bi bi-currency-euro me-2"></i>Derniers paiements</h6>
+                <a href="{% url 'immobilier:paiement_list' %}" class="btn btn-sm btn-outline-primary">Voir tout</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% for paiement in derniers_paiements %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ paiement.locataire|default:"—" }}</strong><br>
+                            <small class="text-muted">{{ paiement.bail.bien.titre|truncatechars:30 }}</small>
+                        </div>
+                        <div class="text-end">
+                            <span class="fw-bold">{{ paiement.montant }} €</span><br>
+                            <small class="text-muted">{{ paiement.date_paiement|date:"d/m/Y" }}</small>
+                            {% if paiement.statut == 'VALID' %}
+                            <span class="badge bg-success">Validé</span>
+                            {% elif paiement.statut == 'EN_RETARD' %}
+                            <span class="badge bg-danger">En retard</span>
+                            {% else %}
+                            <span class="badge bg-warning text-dark">En attente</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="list-group-item text-center text-muted py-4">
+                        <i class="bi bi-inbox fs-3"></i>
+                        <p class="mt-2">Aucun paiement récent</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h6 class="mb-0"><i class="bi bi-calendar-exclamation me-2"></i>Baux expirant (90 jours)</h6>
+                <a href="{% url 'immobilier:bail_list' %}" class="btn btn-sm btn-outline-primary">Voir tout</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% for bail in baux_expirant %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ bail.locataire }}</strong><br>
+                            <small class="text-muted">{{ bail.bien.titre }}</small>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-warning text-dark">
+                                {{ bail.date_fin|date:"d/m/Y" }}
+                            </span><br>
+                            <small class="text-muted">{{ bail.date_fin|timeuntil }}</small>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="list-group-item text-center text-muted py-4">
+                        <i class="bi bi-check-circle fs-3 text-success"></i>
+                        <p class="mt-2">Aucun bail n'expire dans les 90 jours</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dernières interventions + Impayés -->
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h6 class="mb-0"><i class="bi bi-tools me-2"></i>Dernières interventions</h6>
+                <a href="{% url 'immobilier:intervention_list' %}" class="btn btn-sm btn-outline-primary">Voir tout</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% for intervention in dernieres_interventions %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ intervention.titre|truncatechars:35 }}</strong><br>
+                            <small class="text-muted">{{ intervention.bien.titre }}</small>
+                        </div>
+                        <div class="text-end">
+                            {% if intervention.priorite == 'URG' %}
+                            <span class="badge bg-danger">Urgent</span>
+                            {% elif intervention.priorite == 'HAU' %}
+                            <span class="badge bg-warning text-dark">Haute</span>
+                            {% else %}
+                            <span class="badge bg-info">Normal</span>
+                            {% endif %}
+                            <br>
+                            <small>{{ intervention.get_statut_display }}</small>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="list-group-item text-center text-muted py-4">
+                        <i class="bi bi-check-circle fs-3 text-success"></i>
+                        <p class="mt-2">Aucune intervention récente</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h6 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Impayés</h6>
+                <a href="{% url 'immobilier:paiement_list' %}?statut=EN_RETARD" class="btn btn-sm btn-outline-primary">Voir tout</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% for impaye in impayes %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ impaye.locataire|default:"—" }}</strong><br>
+                            <small class="text-muted">{{ impaye.bail.bien.titre|truncatechars:30 }}</small>
+                        </div>
+                        <div class="text-end">
+                            <span class="fw-bold text-danger">{{ impaye.montant }} €</span><br>
+                            <small class="text-muted">Depuis le {{ impaye.date_paiement|date:"d/m/Y" }}</small>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="list-group-item text-center text-muted py-4">
+                        <i class="bi bi-check-circle fs-3 text-success"></i>
+                        <p class="mt-2">Aucun impayé</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Graphiques (en bas de page) -->
+<div class="row g-3">
+    {% if graphs.revenus_mensuels %}
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white">
+                <h6 class="mb-0"><i class="bi bi-bar-chart me-2"></i>Revenus mensuels</h6>
+            </div>
+            <div class="card-body">
+                <img src="data:image/png;base64,{{ graphs.revenus_mensuels }}" class="img-fluid" alt="Revenus mensuels">
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% if graphs.repartition_biens %}
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white">
+                <h6 class="mb-0"><i class="bi bi-pie-chart me-2"></i>Répartition</h6>
+            </div>
+            <div class="card-body">
+                <img src="data:image/png;base64,{{ graphs.repartition_biens }}" class="img-fluid" alt="Répartition">
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% if graphs.statut_biens %}
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white">
+                <h6 class="mb-0"><i class="bi bi-bar-chart me-2"></i>Statut des biens</h6>
+            </div>
+            <div class="card-body">
+                <img src="data:image/png;base64,{{ graphs.statut_biens }}" class="img-fluid" alt="Statuts">
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

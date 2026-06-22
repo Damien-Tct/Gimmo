@@ -1,0 +1,129 @@
+{% extends 'immobilier/base.html' %}
+{% block title %}Biens immobiliers{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="px-4 pt-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'immobilier:dashboard' %}">Dashboard</a></li>
+        <li class="breadcrumb-item active">Biens</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3><i class="bi bi-building me-2"></i> Biens immobiliers</h3>
+    <a href="{% url 'immobilier:bien_create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> Nouveau bien
+    </a>
+</div>
+
+<!-- Filtres -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-2">
+            <div class="col-md-3">
+                {{ filter.form.q }}
+            </div>
+            <div class="col-md-2">
+                {{ filter.form.type_bien }}
+            </div>
+            <div class="col-md-2">
+                {{ filter.form.statut }}
+            </div>
+            <div class="col-md-2">
+                {{ filter.form.ville }}
+            </div>
+            <div class="col-md-2">
+                {{ filter.form.prix_max }}
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Grille de biens -->
+<div class="row g-3">
+    {% for bien in biens %}
+    <div class="col-md-4 col-lg-3">
+        <div class="card border-0 shadow-sm h-100">
+            {% if bien.photo_principale %}
+            <img src="{{ bien.photo_principale.url }}" class="card-img-top" alt="{{ bien.titre }}" style="height: 200px; object-fit: cover;">
+            {% else %}
+            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                <i class="bi bi-building fs-1 text-muted"></i>
+            </div>
+            {% endif %}
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <span class="badge bg-{% if bien.statut == 'LOUE' %}success{% elif bien.statut == 'DISP' %}info{% elif bien.statut == 'TRAV' %}warning text-dark{% else %}secondary{% endif %}">
+                        {{ bien.get_statut_display }}
+                    </span>
+                    <small class="text-muted">{{ bien.get_type_bien_display }}</small>
+                </div>
+                <h6 class="card-title mb-1">
+                    <a href="{% url 'immobilier:bien_detail' bien.pk %}" class="text-decoration-none text-dark">
+                        {{ bien.titre }}
+                    </a>
+                </h6>
+                <p class="card-text">
+                    <small class="text-muted">
+                        <i class="bi bi-geo-alt me-1"></i>{{ bien.ville }}<br>
+                        <i class="bi bi-house me-1"></i>{{ bien.nombre_pieces }} pièces • {{ bien.surface_habitable }} m²
+                    </small>
+                </p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <strong class="text-primary">{{ bien.loyer_mensuel_indicatif }} €/mois</strong>
+                    <small class="text-muted">{{ bien.proprietaire.nom }}</small>
+                </div>
+            </div>
+            <div class="card-footer bg-white border-0">
+                <div class="btn-group w-100">
+                    <a href="{% url 'immobilier:bien_detail' bien.pk %}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-eye"></i>
+                    </a>
+                    <a href="{% url 'immobilier:bien_update' bien.pk %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="text-center py-5 text-muted">
+            <i class="bi bi-inbox fs-1"></i>
+            <p class="mt-2">Aucun bien trouvé</p>
+            <a href="{% url 'immobilier:bien_create' %}" class="btn btn-primary">
+                <i class="bi bi-plus-lg"></i> Ajouter un bien
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if is_paginated %}
+<nav class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Précédent</a>
+        </li>
+        {% endif %}
+        <li class="page-item active">
+            <span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+        </li>
+        {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Suivant</a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

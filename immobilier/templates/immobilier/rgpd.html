@@ -1,0 +1,66 @@
+{% extends 'immobilier/base.html' %}
+{% block title %}Mentions légales & RGPD{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2><i class="bi bi-shield-check me-2"></i> Mentions légales & Protection des données</h2>
+    <hr>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <h5>1. Éditeur de la plateforme</h5>
+            <p>
+                <strong>Gestion Immo</strong> est un logiciel de gestion locative édité par :<br>
+                <strong>Nom de la société / Gérant</strong><br>
+                Adresse du siège social<br>
+                Email : contact@exemple.fr<br>
+                Tél : 01 23 45 67 89
+            </p>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <h5>2. Hébergement</h5>
+            <p>Cette application est hébergée sur un serveur sécurisé situé en France.</p>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <h5>3. Données collectées (RGPD)</h5>
+            <p>Conformément au Règlement Général sur la Protection des Données (RGPD), les données personnelles collectées via cette application sont :</p>
+            <ul>
+                <li><strong>Données d'identité</strong> : nom, prénom, email, téléphone</li>
+                <li><strong>Données financières</strong> : IBAN, historiques de paiement</li>
+                <li><strong>Données contractuelles</strong> : baux, état des lieux, documents</li>
+                <li><strong>Données de connexion</strong> : logs, adresse IP</li>
+            </ul>
+            <p>Ces données sont strictement nécessaires à la gestion locative et ne sont jamais transmises à des tiers.</p>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <h5>4. Durée de conservation</h5>
+            <p>Les données sont conservées pendant toute la durée de la relation contractuelle, puis archivées conformément aux obligations légales (5 ans après la fin du bail).</p>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <h5>5. Vos droits</h5>
+            <p>Vous disposez d'un droit d'accès, de rectification, d'effacement et de portabilité de vos données.</p>
+            <p>Pour exercer ces droits, contactez-nous à : <strong>contact@exemple.fr</strong></p>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <h5>6. Cookies</h5>
+            <p>Cette application utilise uniquement des cookies strictement nécessaires à son fonctionnement (session utilisateur). Aucun cookie publicitaire ou de追踪 (tracking) n'est utilisé.</p>
+            <p>Vous pouvez configurer votre navigateur pour refuser les cookies, mais certaines fonctionnalités pourraient être altérées.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends 'immobilier/base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}{% if bien %}Modifier{% else %}Ajouter{% endif %} un bien{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="px-4 pt-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'immobilier:dashboard' %}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'immobilier:bien_list' %}">Biens</a></li>
+        <li class="breadcrumb-item active">{% if bien %}Modifier{% else %}Ajouter{% endif %}</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white">
+        <h5 class="mb-0">
+            {% if bien %}
+            <i class="bi bi-pencil me-2"></i> Modifier le bien
+            {% else %}
+            <i class="bi bi-plus-lg me-2"></i> Nouveau bien immobilier
+            {% endif %}
+        </h5>
+    </div>
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <!-- Infos générales -->
+            <h6 class="text-primary mb-3">Informations générales</h6>
+            <div class="row">
+                <div class="col-md-4">{{ form.proprietaire|as_crispy_field }}</div>
+                <div class="col-md-3">{{ form.type_bien|as_crispy_field }}</div>
+                <div class="col-md-2">{{ form.statut|as_crispy_field }}</div>
+                <div class="col-md-3">{{ form.titre|as_crispy_field }}</div>
+            </div>
+            
+            <h6 class="text-primary mb-3 mt-4">Adresse</h6>
+            <div class="row">
+                <div class="col-md-6">{{ form.adresse|as_crispy_field }}</div>
+                <div class="col-md-6">{{ form.complement_adresse|as_crispy_field }}</div>
+                <div class="col-md-3">{{ form.code_postal|as_crispy_field }}</div>
+                <div class="col-md-3">{{ form.ville|as_crispy_field }}</div>
+                <div class="col-md-3">{{ form.quartier|as_crispy_field }}</div>
+                <div class="col-md-3">{{ form.pays|as_crispy_field }}</div>
+            </div>
+
+            <h6 class="text-primary mb-3 mt-4">Caractéristiques</h6>
+            <div class="row">
+                <div class="col-md-3">{{ form.surface_totale|as_crispy_field }}</div>
+                <div class="col-md-3">{{ form.surface_habitable|as_crispy_field }}</div>
+                <div class="col-md-2">{{ form.nombre_pieces|as_crispy_field }}</div>
+                <div class="col-md-2">{{ form.nombre_chambres|as_crispy_field }}</div>
+                <div class="col-md-2">{{ form.etage|as_crispy_field }}</div>
+                <div class="col-md-2">{{ form.nombre_etages_total|as_crispy_field }}</div>
+                <div class="col-md-2">{{ form.annee_construction|as_crispy_field }}</div>
+                <div class="col-md-2">{{ form.mode_chauffage|as_crispy_field }}</div>
+                <div class="col-md-2">{{ form.classe_energie|as_crispy_field }}</div>
+                <div class="col-md-2">{{ form.classe_ges|as_crispy_field }}</div>
+            </div>
+
+            <h6 class="text-primary mb-3 mt-4">Équipements</h6>
+            <div class="row">
+                <div class="col-md-3">{{ form.meuble|as_crispy_field }}</div>
+                <div class="col-md-3">{{ form.ascenseur|as_crispy_field }}</div>
+                <div class="col-md-3">{{ form.balcon|as_crispy_field }}</div>
+                <div class="col-md-3">{{ form.parking|as_crispy_field }}</div>
+                <div class="col-md-3">{{ form.cave|as_crispy_field }}</div>
+                <div class="col-md-3">{{ form.jardin|as_crispy_field }}</div>
+                <div class="col-md-3">{{ form.piscine|as_crispy_field }}</div>
+                <div class="col-md-3">{{ form.interphone|as_crispy_field }}</div>
+                <div class="col-md-3">{{ form.gardien|as_crispy_field }}</div>
+                <div class="col-md-3">{{ form.acces_handicap|as_crispy_field }}</div>
+            </div>
+
+            <h6 class="text-primary mb-3 mt-4">Aspects financiers</h6>
+            <div class="row">
+                <div class="col-md-3">{{ form.loyer_mensuel_indicatif|as_crispy_field }}</div>
+                <div class="col-md-3">{{ form.charges_indicatives|as_crispy_field }}</div>
+                <div class="col-md-3">{{ form.depot_garantie_mois|as_crispy_field }}</div>
+                <div class="col-md-3">{{ form.taxe_fonciere|as_crispy_field }}</div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">{{ form.description|as_crispy_field }}</div>
+                <div class="col-md-12">{{ form.notes|as_crispy_field }}</div>
+                <div class="col-md-4">{{ form.photo_principale|as_crispy_field }}</div>
+                <div class="col-md-2">{{ form.actif|as_crispy_field }}</div>
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-lg"></i> {% if bien %}Enregistrer les modifications{% else %}Créer le bien{% endif %}
+                </button>
+                <a href="{% url 'immobilier:bien_list' %}" class="btn btn-secondary">Annuler</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
