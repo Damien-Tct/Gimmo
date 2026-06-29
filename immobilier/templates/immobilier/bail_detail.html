@@ -19,6 +19,7 @@
         <div class="btn-group">
             <a href="{% url 'immobilier:paiement_create' bail.pk %}" class="btn btn-success"><i class="bi bi-currency-euro"></i> Encaisser loyer</a>
             <a href="{% url 'immobilier:bail_appel_loyer' bail.pk %}" class="btn btn-info text-white"><i class="bi bi-send"></i> Appel de loyer</a>
+            <a href="{% url 'immobilier:bail_consentement_rgpd' bail.pk %}" class="btn btn-outline-secondary" title="Consentement RGPD — Exploitation des données & stockage informatique"><i class="bi bi-shield-check"></i> Consentement RGPD</a>
         </div>
         <a href="{% url 'immobilier:bail_delete' bail.pk %}" class="btn btn-danger"><i class="bi bi-trash"></i> Supprimer</a>
     </div>

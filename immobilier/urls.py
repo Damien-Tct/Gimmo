@@ -49,6 +49,7 @@ urlpatterns = [
     path('baux/<int:pk>/paiements/ajouter/', views.PaiementCreateView.as_view(), name='paiement_create'),
     path('paiements/<int:pk>/quittance/', views.generate_quittance, name='paiement_quittance'),
     path('baux/<int:pk>/appel-loyer/', views.generate_appel_loyer, name='bail_appel_loyer'),
+    path('baux/<int:pk>/consentement-rgpd/', views.generate_consentement_rgpd, name='bail_consentement_rgpd'),
     
     # Appels de loyer groupés
     path('appels-loyers/', views.AppelsLoyersView.as_view(), name='appels_loyers'),

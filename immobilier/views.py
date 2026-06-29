@@ -30,7 +30,7 @@ from .filters import (
     ProprietaireFilter, BienImmobilierFilter, LocataireFilter,
     BailFilter, PaiementFilter, InterventionFilter
 )
-from .utils import get_dashboard_stats, generate_graphiques, generer_quittance_pdf, generer_appel_loyer_pdf
+from .utils import get_dashboard_stats, generate_graphiques, generer_quittance_pdf, generer_appel_loyer_pdf, generer_consentement_rgpd_pdf
 
 
 # ===================================================================
@@ -495,6 +495,21 @@ def generate_appel_loyer(request, pk):
         return HttpResponseRedirect(reverse('immobilier:bail_detail', kwargs={'pk': pk}))
     except Exception as e:
         messages.error(request, f'Erreur lors de la génération : {str(e)}')
+        return HttpResponseRedirect(reverse('immobilier:bail_detail', kwargs={'pk': pk}))
+
+
+def generate_consentement_rgpd(request, pk):
+    """Vue pour générer le document de consentement RGPD (exploitation données + stockage informatique)."""
+    bail = get_object_or_404(Bail, pk=pk)
+    try:
+        filepath = generer_consentement_rgpd_pdf(bail)
+        messages.success(
+            request,
+            f'Document de consentement RGPD généré avec succès pour {bail.locataire}.'
+        )
+        return HttpResponseRedirect(reverse('immobilier:bail_detail', kwargs={'pk': pk}))
+    except Exception as e:
+        messages.error(request, f'Erreur lors de la génération du consentement RGPD : {str(e)}')
         return HttpResponseRedirect(reverse('immobilier:bail_detail', kwargs={'pk': pk}))
 
 
