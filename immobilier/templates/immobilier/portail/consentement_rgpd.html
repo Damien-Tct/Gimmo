@@ -1,0 +1,122 @@
+{% extends 'immobilier/portail/base_portail.html' %}
+{% block title %}Consentement RGPD{% endblock %}
+
+{% block content %}
+<div class="portail-header mx-3">
+    <h4><i class="bi bi-shield-check me-2"></i> Consentement RGPD</h4>
+    <p class="mb-0">Protection de vos données personnelles</p>
+</div>
+
+<div class="px-4">
+    <div class="row g-3 justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0"><i class="bi bi-database-lock me-2"></i> Autorisation d'exploitation des données</h6>
+                </div>
+                <div class="card-body">
+                    {% if consentement_donne %}
+                        {# ── Consentement déjà donné ── #}
+                        <div class="text-center py-4">
+                            <i class="bi bi-check-circle text-success fs-1 mb-3 d-block"></i>
+                            <h5 class="text-success">Consentement enregistré</h5>
+                            <p class="text-muted">
+                                Vous avez donné votre consentement le
+                                <strong>{{ date_consentement|date:"d/m/Y à H:i" }}</strong>.
+                            </p>
+                            <hr class="my-4">
+                            <p class="text-muted small">
+                                Conformément au RGPD, vous pouvez retirer votre consentement à tout moment
+                                en contactant votre gestionnaire.
+                            </p>
+                        </div>
+                    {% else %}
+                        {# ── Formulaire de consentement ── #}
+                        <div class="mb-4 p-3 bg-light rounded border">
+                            <h6 class="mb-3"><i class="bi bi-info-circle me-2 text-primary"></i> Pourquoi ce consentement ?</h6>
+                            <p class="small mb-2">
+                                Dans le cadre de votre contrat de location, le Bailleur
+                                collecte et traite des données à caractère personnel vous concernant.
+                            </p>
+                            <p class="small mb-0">
+                                Conformément au Règlement Général sur la Protection des Données (RGPD),
+                                votre consentement explicite est requis pour :
+                            </p>
+                            <ul class="small mt-2 mb-0">
+                                <li>Le traitement de vos données d'identité (nom, prénom, date de naissance)</li>
+                                <li>Le traitement de vos coordonnées (adresse, téléphone, email)</li>
+                                <li>La conservation de vos justificatifs (pièce d'identité, domicile, revenus)</li>
+                                <li>Le stockage informatique de ces données dans le logiciel de gestion</li>
+                                <li>La génération et l'archivage de documents (quittances, appels de loyer)</li>
+                            </ul>
+                        </div>
+
+                        <div class="mb-4 p-3 bg-warning-subtle rounded border border-warning">
+                            <h6 class="mb-2"><i class="bi bi-shield-exclamation me-2 text-warning"></i> Vos droits</h6>
+                            <p class="small mb-0">
+                                Vous disposez à tout moment d'un droit d'accès, de rectification,
+                                d'effacement, de limitation et d'opposition concernant vos données.
+                                Vous pouvez retirer votre consentement à tout moment par simple demande
+                                écrite auprès de votre gestionnaire.
+                            </p>
+                        </div>
+
+                        {% if locataire %}
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <h6>Résumé des données concernées</h6>
+                                <ul class="list-group list-group-flush small mb-3">
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>Identité</span>
+                                        <span class="text-muted">{{ locataire.civilite }} {{ locataire.prenom }} {{ locataire.nom }}</span>
+                                    </li>
+                                    {% if locataire.date_naissance %}
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>Date de naissance</span>
+                                        <span class="text-muted">{{ locataire.date_naissance|date:"d/m/Y" }}</span>
+                                    </li>
+                                    {% endif %}
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>Email</span>
+                                        <span class="text-muted">{{ locataire.email }}</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>Téléphone</span>
+                                        <span class="text-muted">{{ locataire.telephone }}</span>
+                                    </li>
+                                    {% if bien %}
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>Logement</span>
+                                        <span class="text-muted">{{ bien.adresse }}, {{ bien.code_postal }} {{ bien.ville }}</span>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-lg w-100">
+                                <i class="bi bi-check-lg me-2"></i> Je donne mon consentement
+                            </button>
+                            <p class="text-muted small text-center mt-2 mb-0">
+                                En cliquant, vous acceptez le traitement de vos données personnelles
+                                conformément au RGPD et à la loi Informatique et Libertés.
+                            </p>
+                        </form>
+                        {% else %}
+                        <div class="alert alert-warning mb-0">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            Aucun profil locataire associé à votre compte. Contactez votre gestionnaire.
+                        </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="text-center mt-3">
+                <a href="{% url 'immobilier:rgpd' %}" class="text-muted small" target="_blank">
+                    <i class="bi bi-box-arrow-up-right me-1"></i> Consulter les mentions légales complètes
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

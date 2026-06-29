@@ -344,6 +344,11 @@ class Locataire(models.Model):
     )
 
     iban = models.CharField(_('IBAN'), max_length=34, blank=True)
+
+    # Consentement RGPD
+    consentement_rgpd = models.BooleanField(_('Consentement RGPD'), default=False)
+    date_consentement_rgpd = models.DateTimeField(_('Date du consentement RGPD'), null=True, blank=True)
+
     notes = models.TextField(_('Notes'), blank=True)
     actif = models.BooleanField(_('Actif'), default=True)
     date_creation = models.DateTimeField(_('Date de création'), auto_now_add=True)

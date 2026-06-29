@@ -81,6 +81,11 @@
                     <i class="bi bi-key me-2"></i><span>Mot de passe</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link text-white {% if request.resolver_match.url_name == 'portail_consentement_rgpd' %}active bg-primary rounded{% endif %}" href="{% url 'immobilier:portail_consentement_rgpd' %}">
+                    <i class="bi bi-shield-check me-2"></i><span>Consentement RGPD</span>
+                </a>
+            </li>
         </ul>
         <hr class="text-secondary">
         <div class="mt-auto">

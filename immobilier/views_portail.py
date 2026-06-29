@@ -185,6 +185,10 @@ class PortailAccueilView(LoginRequiredMixin, TemplateView):
                         'fichier': bail.etat_lieux_sortie.url,
                         'date': bail.date_etat_lieux_sortie or '',
                     })
+
+            # Consentement RGPD
+            context['consentement_rgpd'] = locataire.consentement_rgpd
+            context['date_consentement_rgpd'] = locataire.date_consentement_rgpd
         
         return context
 
@@ -413,6 +417,46 @@ class PortailDocumentUploadView(LoginRequiredMixin, CreateView):
 # ===================================================================
 # CHANGEMENT DE MOT DE PASSE (Portail locataire)
 # ===================================================================
+class PortailConsentementRGPDView(LoginRequiredMixin, TemplateView):
+    """Vue de consentement RGPD pour le locataire."""
+    template_name = 'immobilier/portail/consentement_rgpd.html'
+
+    def get_locataire(self):
+        user = self.request.user
+        locataire = getattr(user, 'locataire_profile', None)
+        if not locataire:
+            try:
+                locataire = Locataire.objects.get(email=user.email)
+            except Locataire.DoesNotExist:
+                locataire = None
+        return locataire
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        locataire = self.get_locataire()
+        context['locataire'] = locataire
+        if locataire:
+            context['consentement_donne'] = locataire.consentement_rgpd
+            context['date_consentement'] = locataire.date_consentement_rgpd
+            context['bail_actif'] = locataire.get_bail_actif()
+            context['bien'] = locataire.get_bien_actuel()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        locataire = self.get_locataire()
+        if not locataire:
+            messages.error(request, 'Locataire introuvable.')
+            return redirect('immobilier:portail_accueil')
+        if locataire.consentement_rgpd:
+            messages.info(request, 'Vous avez déjà donné votre consentement RGPD.')
+        else:
+            locataire.consentement_rgpd = True
+            locataire.date_consentement_rgpd = timezone.now()
+            locataire.save(update_fields=['consentement_rgpd', 'date_consentement_rgpd'])
+            messages.success(request, 'Votre consentement RGPD a été enregistré avec succès.')
+        return redirect('immobilier:portail_consentement_rgpd')
+
+
 class PortailPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
     """Page de changement de mot de passe pour le locataire."""
     template_name = 'immobilier/portail/password_change.html'
@@ -420,8 +464,6 @@ class PortailPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
 
     def form_valid(self, form):
         messages.success(self.request, 'Votre mot de passe a été modifié avec succès.')
-        # Marquer l'utilisateur comme ayant changé son mot de passe (via un champ du profil)
-        # On utilise simplement last_login comme marqueur (si le mdp a déjà été changé)
         return super().form_valid(form)
 
 

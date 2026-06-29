@@ -85,6 +85,9 @@ urlpatterns = [
     path('comptes/gerer/<int:locataire_id>/', views_portail.gerer_compte_locataire, name='gerer_compte_locataire'),
     path('comptes/creer_gestionnaire/', views_portail.creer_utilisateur_gestionnaire, name='creer_utilisateur_gestionnaire'),
     
+    # RGPD & Consentement
+    path('portail/consentement-rgpd/', views_portail.PortailConsentementRGPDView.as_view(), name='portail_consentement_rgpd'),
+
     # RGPD & Mentions légales
     path('rgpd/', views.RgpdView.as_view(), name='rgpd'),
 ]
